@@ -15,7 +15,7 @@ public class Main {
 		new Writer(queue);
 		new Reader(queue);
 	
-
+//cambio de prueba 
 		
 		//cola=new ColaSynchronized();
 		//cola=new ColaBusyWait();
