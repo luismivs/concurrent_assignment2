@@ -12,16 +12,25 @@ import concurrent_assignment2.A_intro.Queue;
  
 class CS_Queue implements Queue{
 	int n=0;
+	volatile boolean readerTurn=false;
 	
 	@Override
 	public void read() {
-		// TODO Auto-generated method stub
+		while(readerTurn==false);
+		
+			System.out.println("Reader: " + n + "\n");
+			readerTurn=false;
+		
 		
 	}
 
 	@Override
 	public void write(int x) {
-		// TODO Auto-generated method stub
+		while(readerTurn==true);
+			
+			System.out.println("Writer");
+			n = x;
+			readerTurn=true;
 		
 	}
 
