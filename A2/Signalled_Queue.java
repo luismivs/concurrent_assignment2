@@ -16,7 +16,7 @@ class Signalled_Queue implements Queue{
 	
 	@Override
 	synchronized public void read() {
-		while(readerTurn==false) {
+		if(readerTurn==false) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
@@ -30,7 +30,7 @@ class Signalled_Queue implements Queue{
 
 	@Override
 	synchronized public void write(int x) {
-		while(readerTurn==true) {
+		if(readerTurn==true) {
 			try {
 				wait();
 			} catch (InterruptedException e) {
