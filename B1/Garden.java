@@ -75,8 +75,8 @@ public class Garden extends Applet {
         
         counter = new Counter(counterD);
        
-        turnstile1= new Turnstile(turn1D,counter);
-        turnstile2= new Turnstile(turn2D,counter);
+        turnstile1= new Turnstile(0,turn1D,counter);
+        turnstile2= new Turnstile(1,turn2D,counter);
         turnstile1.start();
         turnstile2.start();
     }
@@ -87,17 +87,39 @@ class Counter {
 
     int value=0;
     NumberCanvas display;
+    //The two flags for Dekker's Algorithm
+    boolean[] wantsCS={false,false};
+    //The integer for turn
+    volatile int turn = 0;
 
     Counter(NumberCanvas n) {
         display=n;
         display.setvalue(value);
     }
 
-    void increment() {
+    void increment(int ID) { //We add a parameter to be able to identify the thread
+        //pre-protocol
+        wantsCS[ID]=true;
+        turn=1-ID;
+        while(wantsCS[1-ID]){
+            if(turn==(1-ID)){
+                wantsCS[ID]=false;
+                while(turn==(1-ID)){
+                    wantsCS[ID]=true;
+                }
+            }
+        }
+        
+        //CRITICAL SECTION
         int temp = value;   //read[v]
         CC.ForceCC();
         value=temp+1;       //write[v+1]
         display.setvalue(value);
+        //END OF CRITICAL SECTION
+        
+        //post-protocol
+        turn=1-ID;
+        wantsCS[ID]=false;
     }
 }
 
@@ -107,9 +129,10 @@ class Counter {
 class Turnstile extends Thread {
   NumberCanvas display;
   Counter people;
-
-  Turnstile(NumberCanvas n,Counter c)
-    { display = n; people = c; }
+  int ID=0; //WE need to add ID attribute in order to identify each thread
+ 
+  Turnstile(int ID,NumberCanvas n,Counter c)
+    { this.ID=ID; display = n; people = c; }
 
   public void run() {
     try{
@@ -117,7 +140,8 @@ class Turnstile extends Thread {
       for (int i=1;i<=Garden.MAX;i++){
         Thread.sleep(500); //0.5 second
         display.setvalue(i);
-        people.increment();
+        people.increment(ID);
+       
       }
     } catch (InterruptedException e) {}
   }
