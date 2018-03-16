@@ -105,7 +105,7 @@ class Counter {
             if(turn==(1-ID)){
                 wantsCS[ID]=false;
                 while(turn==(1-ID)){
-                    wantsCS[ID]=true;
+                   
                 }
             }
         }
