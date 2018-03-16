@@ -94,7 +94,7 @@ class Counter {
         display.setvalue(value);
     }
 
-    void increment() {
+   synchronized void increment() {
         int temp = value;   //read[v]
         CC.ForceCC();
         value=temp+1;       //write[v+1]
